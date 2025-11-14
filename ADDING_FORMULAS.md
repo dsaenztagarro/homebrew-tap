@@ -4,6 +4,7 @@ This guide explains how to add new formulas to this personal Homebrew tap.
 
 ## Table of Contents
 
+- [Versioning Strategy](#versioning-strategy)
 - [Understanding Tap Repository Locations](#understanding-tap-repository-locations)
 - [Prerequisites](#prerequisites)
 - [Method 1: Using `brew extract` (Recommended)](#method-1-using-brew-extract-recommended)
@@ -12,6 +13,42 @@ This guide explains how to add new formulas to this personal Homebrew tap.
 - [Testing the Formula](#testing-the-formula)
 - [Committing the Formula](#committing-the-formula)
 - [Decision Framework](#decision-framework)
+
+---
+
+## Versioning Strategy
+
+**Important:** Before adding formulas, understand Homebrew's versioning conventions.
+
+This tap follows the official Homebrew naming conventions for versioned formulas:
+
+- **Formula files** use `@X.Y` format (e.g., `openssl@3.5.rb`)
+- **Class names** match the file (e.g., `class OpensslAT35 < Formula`)
+- **Aliases** provide convenience shortcuts (e.g., `openssl@3` → `openssl@3.5.rb`)
+
+**Why this matters:**
+- `brew extract` creates files like `openssl@3.5.4.rb` (includes patch version)
+- You should rename these to follow conventions: `openssl@3.5.rb`
+- This keeps your tap consistent with homebrew-core practices
+
+For detailed information about versioning, naming conventions, and update strategies, see:
+**[docs/VERSIONING_STRATEGY.md](docs/VERSIONING_STRATEGY.md)**
+
+**Quick example:**
+```bash
+# After extracting with brew extract
+git mv Formula/openssl@3.5.4.rb Formula/openssl@3.5.rb
+
+# Edit Formula/openssl@3.5.rb:
+# Change: class OpensslAT354 < Formula
+# To:     class OpensslAT35 < Formula
+
+# Create convenience aliases
+mkdir -p Aliases
+cd Aliases
+ln -s ../Formula/openssl@3.5.rb openssl@3
+ln -s ../Formula/openssl@3.5.rb openssl@3.5.4  # backward compatibility
+```
 
 ---
 
