@@ -8,45 +8,45 @@
 #   (OpenSSL::SSL::SSLError)
 #   https://github.com/ruby/openssl/issues/949#issuecomment-3368551818
 # Tested on: macOS 14 (Sonoma) - arm64
-class OpensslAT354 < Formula
-  desc "Cryptography and SSL/TLS Toolkit"
-  homepage "https://openssl-library.org"
-  url "https://github.com/openssl/openssl/releases/download/openssl-3.5.4/openssl-3.5.4.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/openssl-3.5.4.tar.gz"
-  sha256 "967311f84955316969bdb1d8d4b983718ef42338639c621ec4c34fddef355e99"
-  license "Apache-2.0"
+class OpensslAT35 < Formula
+  desc 'Cryptography and SSL/TLS Toolkit'
+  homepage 'https://openssl-library.org'
+  url 'https://github.com/openssl/openssl/releases/download/openssl-3.5.4/openssl-3.5.4.tar.gz'
+  mirror 'http://fresh-center.net/linux/misc/openssl-3.5.4.tar.gz'
+  sha256 '967311f84955316969bdb1d8d4b983718ef42338639c621ec4c34fddef355e99'
+  license 'Apache-2.0'
 
   livecheck do
-    url "https://openssl-library.org/source/"
+    url 'https://openssl-library.org/source/'
     regex(/href=.*?openssl[._-]v?(3(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "ca-certificates"
+  depends_on 'ca-certificates'
 
   on_linux do
-    resource "Test::Harness" do
-      url "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.52.tar.gz"
-      mirror "http://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.52.tar.gz"
-      sha256 "8fe65cfc0261ed3c8a4395f0524286f5719669fe305f9b03b16cf3684d62cd70"
+    resource 'Test::Harness' do
+      url 'https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.52.tar.gz'
+      mirror 'http://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.52.tar.gz'
+      sha256 '8fe65cfc0261ed3c8a4395f0524286f5719669fe305f9b03b16cf3684d62cd70'
     end
 
-    resource "Test::More" do
-      url "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302214.tar.gz"
-      mirror "http://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302214.tar.gz"
-      sha256 "6077ecc35f37b11b3b75df2d0ba1b9ca541f1dc24b2be8e15b6e91f78e2e03fc"
+    resource 'Test::More' do
+      url 'https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302214.tar.gz'
+      mirror 'http://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302214.tar.gz'
+      sha256 '6077ecc35f37b11b3b75df2d0ba1b9ca541f1dc24b2be8e15b6e91f78e2e03fc'
     end
 
-    resource "ExtUtils::MakeMaker" do
-      url "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.76.tar.gz"
-      mirror "http://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.76.tar.gz"
-      sha256 "30bcfd75fec4d512e9081c792f7cb590009d9de2fe285ffa8eec1be35a5ae7ca"
+    resource 'ExtUtils::MakeMaker' do
+      url 'https://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.76.tar.gz'
+      mirror 'http://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.76.tar.gz'
+      sha256 '30bcfd75fec4d512e9081c792f7cb590009d9de2fe285ffa8eec1be35a5ae7ca'
     end
   end
 
-  link_overwrite "bin/c_rehash", "bin/openssl", "include/openssl/*"
-  link_overwrite "lib/libcrypto*", "lib/libssl*"
-  link_overwrite "lib/pkgconfig/libcrypto.pc", "lib/pkgconfig/libssl.pc", "lib/pkgconfig/openssl.pc"
-  link_overwrite "share/doc/openssl/*", "share/man/man*/*ssl"
+  link_overwrite 'bin/c_rehash', 'bin/openssl', 'include/openssl/*'
+  link_overwrite 'lib/libcrypto*', 'lib/libssl*'
+  link_overwrite 'lib/pkgconfig/libcrypto.pc', 'lib/pkgconfig/libssl.pc', 'lib/pkgconfig/openssl.pc'
+  link_overwrite 'share/doc/openssl/*', 'share/man/man*/*ssl'
 
   # SSLv2 died with 1.1.0, so no-ssl2 no longer required.
   # SSLv3 & zlib are off by default with 1.1.0 but this may not
@@ -62,63 +62,63 @@ class OpensslAT354 < Formula
       no-zlib
     ]
     on_linux do
-      args += (ENV.cflags || "").split
-      args += (ENV.cppflags || "").split
-      args += (ENV.ldflags || "").split
+      args += (ENV.cflags || '').split
+      args += (ENV.cppflags || '').split
+      args += (ENV.ldflags || '').split
     end
     args
   end
 
   def install
     if OS.linux?
-      ENV.prepend_create_path "PERL5LIB", buildpath/"lib/perl5"
-      ENV.prepend_path "PATH", buildpath/"bin"
+      ENV.prepend_create_path 'PERL5LIB', buildpath / 'lib/perl5'
+      ENV.prepend_path 'PATH', buildpath / 'bin'
 
       %w[ExtUtils::MakeMaker Test::Harness Test::More].each do |r|
         resource(r).stage do
-          system "perl", "Makefile.PL", "INSTALL_BASE=#{buildpath}"
-          system "make", "PERL5LIB=#{ENV["PERL5LIB"]}", "CC=#{ENV.cc}"
-          system "make", "install"
+          system 'perl', 'Makefile.PL', "INSTALL_BASE=#{buildpath}"
+          system 'make', "PERL5LIB=#{ENV['PERL5LIB']}", "CC=#{ENV.cc}"
+          system 'make', 'install'
         end
       end
     end
 
     # This could interfere with how we expect OpenSSL to build.
-    ENV.delete("OPENSSL_LOCAL_CONFIG_DIR")
+    ENV.delete('OPENSSL_LOCAL_CONFIG_DIR')
 
     # This ensures where Homebrew's Perl is needed the Cellar path isn't
     # hardcoded into OpenSSL's scripts, causing them to break every Perl update.
     # Whilst our env points to opt_bin, by default OpenSSL resolves the symlink.
-    ENV["PERL"] = Formula["perl"].opt_bin/"perl" if which("perl") == Formula["perl"].opt_bin/"perl"
+    ENV['PERL'] = Formula['perl'].opt_bin / 'perl' if which('perl') == Formula['perl'].opt_bin / 'perl'
 
     arch_args = []
     if OS.mac?
       arch_args += %W[darwin64-#{Hardware::CPU.arch}-cc enable-ec_nistp_64_gcc_128]
     elsif Hardware::CPU.intel?
-      arch_args << (Hardware::CPU.is_64_bit? ? "linux-x86_64" : "linux-elf")
+      arch_args << (Hardware::CPU.is_64_bit? ? 'linux-x86_64' : 'linux-elf')
     elsif Hardware::CPU.arm?
-      arch_args << (Hardware::CPU.is_64_bit? ? "linux-aarch64" : "linux-armv4")
+      arch_args << (Hardware::CPU.is_64_bit? ? 'linux-aarch64' : 'linux-armv4')
     end
 
     openssldir.mkpath
-    system "perl", "./Configure", *(configure_args + arch_args)
-    system "make"
-    system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl"
+    system 'perl', './Configure', *(configure_args + arch_args)
+    system 'make'
+    system 'make', 'install', "MANDIR=#{man}", 'MANSUFFIX=ssl'
     # AF_ALG support isn't always enabled (e.g. some containers), which breaks the tests.
     # AF_ALG is a kernel feature and failures are unlikely to be issues with the formula.
-    system "make", "HARNESS_JOBS=#{ENV.make_jobs}", "test", "TESTS=-test_afalg"
+    system 'make', "HARNESS_JOBS=#{ENV.make_jobs}", 'test', 'TESTS=-test_afalg'
 
     # Prevent `brew` from pruning the `certs` and `private` directories.
-    touch %w[certs private].map { |subdir| openssldir/subdir/".keepme" }
+    touch(%w[certs private].map { |subdir| openssldir / subdir / '.keepme' })
   end
 
   def openssldir
-    etc/"openssl@3"
+    etc / 'openssl@3'
   end
 
   def post_install
-    rm(openssldir/"cert.pem") if (openssldir/"cert.pem").exist?
-    openssldir.install_symlink Formula["ca-certificates"].pkgetc/"cert.pem"
+    rm(openssldir / 'cert.pem') if (openssldir / 'cert.pem').exist?
+    openssldir.install_symlink Formula['ca-certificates'].pkgetc / 'cert.pem'
   end
 
   def caveats
@@ -133,15 +133,15 @@ class OpensslAT354 < Formula
 
   test do
     # Make sure the necessary .cnf file exists, otherwise OpenSSL gets moody.
-    assert_path_exists pkgetc/"openssl.cnf", "OpenSSL requires the .cnf file for some functionality"
-    assert_path_exists openssldir/"certs", "OpenSSL throws confusing errors when this directory is missing"
+    assert_path_exists pkgetc / 'openssl.cnf', 'OpenSSL requires the .cnf file for some functionality'
+    assert_path_exists openssldir / 'certs', 'OpenSSL throws confusing errors when this directory is missing'
 
     # Check OpenSSL itself functions as expected.
-    (testpath/"testfile.txt").write("This is a test file")
-    expected_checksum = "e2d0fe1585a63ec6009c8016ff8dda8b17719a637405a4e23c0ff81339148249"
-    system bin/"openssl", "dgst", "-sha256", "-out", "checksum.txt", "testfile.txt"
-    open("checksum.txt") do |f|
-      checksum = f.read(100).split("=").last.strip
+    (testpath / 'testfile.txt').write('This is a test file')
+    expected_checksum = 'e2d0fe1585a63ec6009c8016ff8dda8b17719a637405a4e23c0ff81339148249'
+    system bin / 'openssl', 'dgst', '-sha256', '-out', 'checksum.txt', 'testfile.txt'
+    open('checksum.txt') do |f|
+      checksum = f.read(100).split('=').last.strip
       assert_equal checksum, expected_checksum
     end
 
@@ -167,7 +167,7 @@ class OpensslAT354 < Formula
       -----END CERTIFICATE-----
     PEM
     output = pipe_output("#{bin}/openssl verify 2>&1", bad_cert, 2)
-    assert_match "verification failed", output
-    refute_match "error:80000002", output
+    assert_match 'verification failed', output
+    refute_match 'error:80000002', output
   end
 end
