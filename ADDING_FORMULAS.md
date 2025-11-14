@@ -54,7 +54,21 @@ brew info openssl@3
 
 ### Step 2: Find the Git Commit (Optional but Recommended)
 
-For maximum reproducibility, find the specific commit in homebrew-core:
+For maximum reproducibility, you can find the specific commit in homebrew-core. **Note:** This step is optional - you can skip directly to Step 3 and use `brew extract --version=X.Y.Z` without specifying a git revision.
+
+#### Option A: Using Local homebrew-core Repository
+
+First, ensure homebrew-core is tapped:
+
+```bash
+# Check if homebrew/core is already tapped
+brew tap | grep homebrew/core
+
+# If not present, tap it (this will clone the repository locally)
+brew tap homebrew/core
+```
+
+Then navigate to the repository and find commits:
 
 ```bash
 # Navigate to homebrew-core repository
@@ -69,6 +83,20 @@ git log --oneline Formula/o/openssl@3.rb | head -20
 
 Look for a commit that matches your desired version.
 
+#### Option B: Using GitHub Web Interface
+
+Browse the formula history directly on GitHub:
+
+```
+https://github.com/Homebrew/homebrew-core/commits/master/Formula/<first-letter>/<formula-name>.rb
+```
+
+Examples:
+- OpenSSL: https://github.com/Homebrew/homebrew-core/commits/master/Formula/o/openssl@3.rb
+- Redis: https://github.com/Homebrew/homebrew-core/commits/master/Formula/r/redis.rb
+
+Click on commits to find the hash for your desired version.
+
 ### Step 3: Extract the Formula
 
 Use `brew extract` to create the formula in your tap:
@@ -77,16 +105,21 @@ Use `brew extract` to create the formula in your tap:
 # Basic extraction (latest version)
 brew extract <formula-name> dsaenztagarro/tap
 
-# Extract specific version (recommended)
+# Extract specific version (recommended - works without Step 2)
 brew extract --version=<version> <formula-name> dsaenztagarro/tap
 
-# Extract from specific commit (most reproducible)
+# Extract from specific commit (most reproducible - requires commit from Step 2)
 brew extract --version=<version> --git-revision=<commit> <formula-name> dsaenztagarro/tap
 
 # Examples:
+# Without git revision (brew extract will find the appropriate commit)
 brew extract --version=3.2.0 openssl@3 dsaenztagarro/tap
+
+# With git revision (for exact reproducibility)
 brew extract --version=3.2.0 --git-revision=abc1234 openssl@3 dsaenztagarro/tap
 ```
+
+**Note:** The `--git-revision` parameter is optional. If you skip Step 2, just use `--version` and `brew extract` will automatically find the appropriate commit from homebrew-core's history.
 
 ### Step 4: Add Metadata Header
 
@@ -360,11 +393,15 @@ git commit -m "Add redis formula (version 7.2.3)
 ### Example 2: Adding AWS CLI
 
 ```bash
-# Extract latest version from homebrew-core
+# Option A: Simple extraction (without finding git commit)
+brew extract --version=2.13.25 awscli dsaenztagarro/tap
+
+# Option B: With git commit for maximum reproducibility
+# First, find the commit (requires homebrew/core tapped)
 cd $(brew --repository homebrew/core)
 git log --oneline Formula/a/awscli.rb | head -10
 
-# Extract with commit for reproducibility
+# Extract with specific commit
 brew extract --version=2.13.25 --git-revision=xyz9876 awscli dsaenztagarro/tap
 
 # Add metadata and commit
@@ -385,6 +422,24 @@ git commit -m "Add awscli formula (version 2.13.25)
 
 ## Troubleshooting
 
+### Issue: "No such file or directory" when accessing homebrew/core
+
+**Cause:** The homebrew/core tap is not installed locally.
+
+**Solution:**
+```bash
+# Tap homebrew/core to clone the repository locally
+brew tap homebrew/core
+
+# Verify it's installed
+brew tap | grep homebrew/core
+
+# Now you can access the repository
+cd $(brew --repository homebrew/core)
+```
+
+**Alternative:** Skip finding git commits and just use `brew extract --version=X.Y.Z` without the `--git-revision` parameter.
+
 ### Issue: "Formula not found" during extraction
 
 **Cause:** The formula or version doesn't exist in homebrew-core history.
@@ -394,9 +449,12 @@ git commit -m "Add awscli formula (version 2.13.25)
 # Check if formula exists
 brew search <formula-name>
 
-# Check available versions in git history
+# If homebrew/core is tapped, check available versions in git history
 cd $(brew --repository homebrew/core)
 git log --all --oneline -- Formula/<letter>/<formula-name>.rb
+
+# Or use GitHub to browse formula history
+# https://github.com/Homebrew/homebrew-core/commits/master/Formula/<letter>/<formula-name>.rb
 ```
 
 ### Issue: "Permission denied" during extraction
