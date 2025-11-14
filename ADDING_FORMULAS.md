@@ -33,12 +33,12 @@ When you **first create** a Homebrew tap, you typically:
    mkdir homebrew-tap
    cd homebrew-tap
    git init
-   
+
    # Create initial files
    mkdir Formula
    touch README.md
    # Create initial formulas, documentation, etc.
-   
+
    # Commit and push
    git add .
    git commit -m "Initial setup"
@@ -132,7 +132,7 @@ brew update
    ```bash
    cd $(brew --repository dsaenztagarro/tap)
    pwd  # Shows: /opt/homebrew/Library/Taps/dsaenztagarro/homebrew-tap
-   
+
    # This is now your working directory for all tap maintenance
    ```
 
@@ -172,21 +172,21 @@ Before adding a formula, ensure you have:
    ```bash
    brew tap dsaenztagarro/tap
    ```
-   
+
    This creates a git repository at `/opt/homebrew/Library/Taps/dsaenztagarro/homebrew-tap`
 
 3. **Navigate to the tap location** (recommended workflow):
    ```bash
    cd $(brew --repository dsaenztagarro/tap)
    ```
-   
+
    **Note**: All instructions below assume you're working in the tap location.
 
 4. **homebrew/core tapped with full git history** (required for `brew extract`):
    ```bash
    brew tap --force homebrew/core
    ```
-   
+
    This downloads the full homebrew-core git repository (~500MB+) which is needed for `brew extract` to search version history.
 
 ---
