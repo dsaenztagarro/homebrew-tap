@@ -54,24 +54,35 @@ brew info openssl@3
 
 ### Step 2: Find the Git Commit (Optional but Recommended)
 
-For maximum reproducibility, you can find the specific commit in homebrew-core. **Note:** This step is optional - you can skip directly to Step 3 and use `brew extract --version=X.Y.Z` without specifying a git revision.
+For maximum reproducibility, you can find the specific commit in homebrew-core. **Note:** This step is entirely optional - you can skip directly to Step 3 and use `brew extract --version=X.Y.Z` without specifying a git revision. `brew extract` works out of the box without any additional setup.
 
-#### Option A: Using Local homebrew-core Repository
+#### Option A: Using GitHub Web Interface (Recommended)
 
-First, ensure homebrew-core is tapped:
+Browse the formula history directly on GitHub - no local setup required:
 
-```bash
-# Check if homebrew/core is already tapped
-brew tap | grep homebrew/core
-
-# If not present, tap it (this will clone the repository locally)
-brew tap homebrew/core
+```
+https://github.com/Homebrew/homebrew-core/commits/master/Formula/<first-letter>/<formula-name>.rb
 ```
 
-Then navigate to the repository and find commits:
+Examples:
+- OpenSSL: https://github.com/Homebrew/homebrew-core/commits/master/Formula/o/openssl@3.rb
+- Redis: https://github.com/Homebrew/homebrew-core/commits/master/Formula/r/redis.rb
+- AWS CLI: https://github.com/Homebrew/homebrew-core/commits/master/Formula/a/awscli.rb
+
+Click on commits to find the hash for your desired version.
+
+#### Option B: Using Local homebrew-core Repository (Advanced Users Only)
+
+**⚠️ Note:** Modern Homebrew (2021+) has homebrew/core built-in. You typically don't need to tap it manually, and doing so is only necessary for Homebrew contributors or advanced use cases.
+
+If you really need local git access to homebrew-core:
 
 ```bash
-# Navigate to homebrew-core repository
+# Force tap homebrew/core (only if you need local git access)
+# This is NOT required for brew extract to work!
+brew tap --force homebrew/core
+
+# Navigate to the repository and find commits
 cd $(brew --repository homebrew/core)
 
 # Find commits for the formula
@@ -83,19 +94,7 @@ git log --oneline Formula/o/openssl@3.rb | head -20
 
 Look for a commit that matches your desired version.
 
-#### Option B: Using GitHub Web Interface
-
-Browse the formula history directly on GitHub:
-
-```
-https://github.com/Homebrew/homebrew-core/commits/master/Formula/<first-letter>/<formula-name>.rb
-```
-
-Examples:
-- OpenSSL: https://github.com/Homebrew/homebrew-core/commits/master/Formula/o/openssl@3.rb
-- Redis: https://github.com/Homebrew/homebrew-core/commits/master/Formula/r/redis.rb
-
-Click on commits to find the hash for your desired version.
+**Recommendation:** Use Option A (GitHub web interface) instead - it's simpler and doesn't require local repository setup.
 
 ### Step 3: Extract the Formula
 
@@ -393,13 +392,13 @@ git commit -m "Add redis formula (version 7.2.3)
 ### Example 2: Adding AWS CLI
 
 ```bash
-# Option A: Simple extraction (without finding git commit)
+# Option A: Simple extraction (recommended - no git commit needed)
 brew extract --version=2.13.25 awscli dsaenztagarro/tap
 
 # Option B: With git commit for maximum reproducibility
-# First, find the commit (requires homebrew/core tapped)
-cd $(brew --repository homebrew/core)
-git log --oneline Formula/a/awscli.rb | head -10
+# First, find the commit using GitHub:
+# Visit: https://github.com/Homebrew/homebrew-core/commits/master/Formula/a/awscli.rb
+# Find the commit hash for version 2.13.25 (e.g., xyz9876)
 
 # Extract with specific commit
 brew extract --version=2.13.25 --git-revision=xyz9876 awscli dsaenztagarro/tap
@@ -422,23 +421,45 @@ git commit -m "Add awscli formula (version 2.13.25)
 
 ## Troubleshooting
 
-### Issue: "No such file or directory" when accessing homebrew/core
+### Issue: "Tapping homebrew/core is no longer typically necessary"
 
-**Cause:** The homebrew/core tap is not installed locally.
+**Cause:** Modern Homebrew (2021+) has homebrew/core built-in and doesn't require manual tapping.
 
 **Solution:**
-```bash
-# Tap homebrew/core to clone the repository locally
-brew tap homebrew/core
 
-# Verify it's installed
-brew tap | grep homebrew/core
+This is **not an error** - it's Homebrew telling you that you don't need to tap homebrew/core. You have three options:
+
+**Option 1 (Recommended):** Use GitHub web interface to find commits
+- Browse https://github.com/Homebrew/homebrew-core/commits/master/Formula/...
+- No local setup needed
+
+**Option 2 (Simplest):** Skip finding git commits entirely
+```bash
+# Just use brew extract with version - it works without git-revision
+brew extract --version=X.Y.Z <formula-name> dsaenztagarro/tap
+```
+
+**Option 3 (Advanced):** Force tap if you really need local git access
+```bash
+# Only use this if you need local git history access
+brew tap --force homebrew/core
 
 # Now you can access the repository
 cd $(brew --repository homebrew/core)
 ```
 
-**Alternative:** Skip finding git commits and just use `brew extract --version=X.Y.Z` without the `--git-revision` parameter.
+**Recommendation:** Use Option 1 or 2. Option 3 is only needed for Homebrew contributors or very specific use cases.
+
+### Issue: "No such file or directory" when accessing homebrew/core
+
+**Cause:** You're trying to access the local repository without force-tapping it.
+
+**Solution:**
+
+Don't access the local repository - use the GitHub web interface instead:
+- https://github.com/Homebrew/homebrew-core/commits/master/Formula/...
+
+Or simply use `brew extract --version=X.Y.Z` without the `--git-revision` parameter.
 
 ### Issue: "Formula not found" during extraction
 
@@ -449,13 +470,14 @@ cd $(brew --repository homebrew/core)
 # Check if formula exists
 brew search <formula-name>
 
-# If homebrew/core is tapped, check available versions in git history
-cd $(brew --repository homebrew/core)
-git log --all --oneline -- Formula/<letter>/<formula-name>.rb
+# Check current version available
+brew info <formula-name>
 
-# Or use GitHub to browse formula history
+# Browse formula history on GitHub to verify version exists
 # https://github.com/Homebrew/homebrew-core/commits/master/Formula/<letter>/<formula-name>.rb
 ```
+
+If the formula or version truly doesn't exist in homebrew-core history, `brew extract` will fail. Verify the formula name and version are correct.
 
 ### Issue: "Permission denied" during extraction
 
