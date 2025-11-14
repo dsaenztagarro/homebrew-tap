@@ -1,5 +1,7 @@
 # Personal Homebrew Tap
 
+[![Formula Tests](https://github.com/dsaenztagarro/homebrew-tap/actions/workflows/tests.yml/badge.svg)](https://github.com/dsaenztagarro/homebrew-tap/actions/workflows/tests.yml)
+
 A custom Homebrew tap for managing version-controlled development tools and dependencies.
 
 ## What is this repository for?
