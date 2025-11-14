@@ -1,0 +1,67 @@
+name: Formula Tests
+
+on:
+  pull_request:
+    paths:
+      - 'Formula/**'
+  push:
+    branches:
+      - master
+
+jobs:
+  test-formulas:
+    strategy:
+      matrix:
+        os: [macos-13, macos-14]  # Intel and Apple Silicon
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Tap this repository
+        run: |
+          # Tap the repository for testing
+          brew tap dsaenztagarro/tap "$GITHUB_WORKSPACE"
+
+      - name: Determine changed formulas
+        id: changed-formulas
+        run: |
+          # Get list of changed formula files
+          if [ -z "${{ github.event.before }}" ] || ! git rev-parse "${{ github.event.before }}" >/dev/null 2>&1; then
+            # For initial commits or when before ref is unavailable, test all formulas
+            CHANGED_FILES=$(find Formula -name "*.rb" -type f)
+          else
+            # For subsequent commits, only test changed formulas
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Formula/.*\.rb$' || true)
+          fi
+          echo "changed_formulas=$CHANGED_FILES" >> $GITHUB_OUTPUT
+
+      - name: Audit formulas
+        run: |
+          for formula in ${{ steps.changed-formulas.outputs.changed_formulas }}; do
+            if [ -n "$formula" ]; then
+              # Extract formula name without path and .rb extension
+              formula_name=$(basename "$formula" .rb)
+              echo "Auditing dsaenztagarro/tap/$formula_name"
+              brew audit --strict --online "$(pwd)/$formula" || echo "Audit failed for $formula_name"
+            fi
+          done
+
+      - name: Install and test formulas
+        run: |
+          for formula in ${{ steps.changed-formulas.outputs.changed_formulas }}; do
+            if [ -n "$formula" ]; then
+              # Extract formula name without path and .rb extension
+              formula_name=$(basename "$formula" .rb)
+              echo "Installing dsaenztagarro/tap/$formula_name"
+              brew install --build-from-source "dsaenztagarro/tap/$formula_name"
+              brew test "dsaenztagarro/tap/$formula_name" || echo "No tests defined for $formula_name"
+            fi
+          done
+
+      - name: Check for conflicts
+        run: |
+          brew doctor || true
