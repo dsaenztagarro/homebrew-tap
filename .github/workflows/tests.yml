@@ -21,10 +21,11 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Tap this repository
+      - name: Set up tap for testing
         run: |
-          # Tap the repository for testing
-          brew tap dsaenztagarro/tap "$GITHUB_WORKSPACE"
+          # Create symlink in Homebrew's tap location
+          mkdir -p "$(brew --repository)/Library/Taps/dsaenztagarro"
+          ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/dsaenztagarro/homebrew-tap"
 
       - name: Determine changed formulas
         id: changed-formulas
