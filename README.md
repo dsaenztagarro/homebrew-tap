@@ -24,29 +24,37 @@ brew tap dsaenztagarro/tap
 
 # 2. Install packages from the tap
 brew install dsaenztagarro/tap/ca-certificates
-brew install dsaenztagarro/tap/openssl@3
-brew install dsaenztagarro/tap/postgresql@14
-brew install dsaenztagarro/tap/redis@7
-brew install dsaenztagarro/tap/awscli
+brew install dsaenztagarro/tap/openssl-ruby
 
 # 3. Verify installation
 brew list --versions | grep dsaenztagarro
 ```
 
-### For Fresh Installation
+### For Ruby Development
+
+For Ruby development, use the `openssl-ruby` formula which provides a stable, controlled OpenSSL version:
 
 ```bash
-# Quick setup script (if available)
-./scripts/setup-homebrew.sh
+# 1. Install openssl-ruby
+brew install dsaenztagarro/tap/openssl-ruby
 
-# Or manually install core packages
-brew tap dsaenztagarro/tap
-brew install dsaenztagarro/tap/ca-certificates
-brew install dsaenztagarro/tap/openssl@3
-brew install dsaenztagarro/tap/postgresql@14
-brew install dsaenztagarro/tap/redis@7
-brew install dsaenztagarro/tap/awscli
+# 2. Configure Ruby to use it
+cat >> ~/.zshrc << 'EOF'
+# Force Ruby to use stable OpenSSL version
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix dsaenztagarro/tap/openssl-ruby)"
+EOF
+
+# 3. Reload shell
+source ~/.zshrc
+
+# 4. Install Ruby
+rbenv install 3.4.3
+
+# 5. Verify
+ruby -ropenssl -e 'puts OpenSSL::OPENSSL_LIBRARY_VERSION'
 ```
+
+See [docs/OPENSSL_RUBY_INCIDENT.md](docs/OPENSSL_RUBY_INCIDENT.md) for detailed explanation of why this approach is recommended.
 
 ### Updating Packages
 
@@ -54,12 +62,14 @@ brew install dsaenztagarro/tap/awscli
 # Update tap formulas
 brew update
 
-# Upgrade a specific package
-brew upgrade dsaenztagarro/tap/openssl@3
+# Upgrade a specific package (example)
+brew upgrade dsaenztagarro/tap/ca-certificates
 
 # Check for available updates
 brew outdated
 ```
+
+**Note on openssl-ruby**: This formula is designed to NOT auto-upgrade. You control when to upgrade by updating the formula yourself after testing.
 
 ## Reasons to Adopt
 
@@ -110,6 +120,9 @@ This practice follows the same professional standards used by industry leaders.
 | Formula | Description | Current Version |
 |---------|-------------|-----------------|
 | `ca-certificates` | Mozilla CA certificate store | 2025-11-04 |
+| `openssl-ruby` | Stable OpenSSL for Ruby installations | 3.5.4 |
+
+**Note**: `openssl-ruby` is specifically designed for Ruby development. It requires explicit configuration and doesn't auto-upgrade, providing a stable SSL/TLS foundation for Ruby applications. See [docs/OPENSSL_RUBY_INCIDENT.md](docs/OPENSSL_RUBY_INCIDENT.md) for the full story.
 
 _More formulas will be added as the tap matures. See the [Formula/](Formula/) directory for all available packages._
 
@@ -122,7 +135,15 @@ This tap is maintained as part of my personal engineering excellence practice:
 - **Testing**: Formulas are tested before addition
 - **Documentation**: Clear documentation for all decisions
 
-## Resources
+## Documentation
+
+### Internal Documentation
+
+- [VERSIONING_STRATEGY.md](docs/VERSIONING_STRATEGY.md) - Formula naming and versioning conventions
+- [OPENSSL_RUBY_INCIDENT.md](docs/OPENSSL_RUBY_INCIDENT.md) - Deep dive into OpenSSL 3.6.0 incident, dynamic linking, and rbenv OpenSSL selection
+- [ADDING_FORMULAS.md](ADDING_FORMULAS.md) - Guide for adding new formulas to this tap
+
+### External Resources
 
 - [Homebrew Documentation](https://docs.brew.sh/)
 - [How to Create a Tap](https://docs.brew.sh/How-to-Create-and-Maintain-a-Tap)

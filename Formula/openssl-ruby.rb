@@ -1,14 +1,20 @@
-# Formula for openssl@3
+# Formula for OpenSSL Ruby
 # Version: 3.5.4
 # Extracted date: 2025-11-14
 # Extraction command: brew extract --version=3.5.4 openssl@3 dsaenztagarro/tap
+# Purpose:
+#   Provide a stable, controlled OpenSSL version for Ruby installations.
+#   Prevents automatic upgrades that can break Ruby SSL/TLS functionality.
+#   Requires explicit RUBY_CONFIGURE_OPTS configuration, ensuring conscious
+#   version selection and preventing silent upgrades through Homebrew's
+#   symlink system.
 # Reason:
 #   Avoid error after upgrading to Openssl 3.6.0:
 #   certificate verify failed (unable to get certificate CRL)
 #   (OpenSSL::SSL::SSLError)
 #   https://github.com/ruby/openssl/issues/949#issuecomment-3368551818
 # Tested on: macOS 14 (Sonoma) - arm64
-class OpensslAT35 < Formula
+class OpensslRuby < Formula
   desc 'Cryptography and SSL/TLS Toolkit'
   homepage 'https://openssl-library.org'
   url 'https://github.com/openssl/openssl/releases/download/openssl-3.5.4/openssl-3.5.4.tar.gz'
@@ -113,7 +119,7 @@ class OpensslAT35 < Formula
   end
 
   def openssldir
-    etc / 'openssl@3'
+    etc / 'openssl-ruby'
   end
 
   def post_install
