@@ -29,6 +29,8 @@ class OpensslRuby < Formula
 
   depends_on 'ca-certificates'
 
+  keg_only :versioned_formula
+
   on_linux do
     resource 'Test::Harness' do
       url 'https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.52.tar.gz'
@@ -48,11 +50,6 @@ class OpensslRuby < Formula
       sha256 '30bcfd75fec4d512e9081c792f7cb590009d9de2fe285ffa8eec1be35a5ae7ca'
     end
   end
-
-  link_overwrite 'bin/c_rehash', 'bin/openssl', 'include/openssl/*'
-  link_overwrite 'lib/libcrypto*', 'lib/libssl*'
-  link_overwrite 'lib/pkgconfig/libcrypto.pc', 'lib/pkgconfig/libssl.pc', 'lib/pkgconfig/openssl.pc'
-  link_overwrite 'share/doc/openssl/*', 'share/man/man*/*ssl'
 
   # SSLv2 died with 1.1.0, so no-ssl2 no longer required.
   # SSLv3 & zlib are off by default with 1.1.0 but this may not
@@ -129,6 +126,17 @@ class OpensslRuby < Formula
 
   def caveats
     <<~EOS
+      This formula is keg-only and not symlinked into #{HOMEBREW_PREFIX}.
+
+      To build Ruby against this OpenSSL version, use:
+        RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl-ruby)"
+
+      For example with rbenv:
+        RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl-ruby)" rbenv install 3.2.0
+
+      With asdf:
+        RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl-ruby)" asdf install ruby 3.2.0
+
       To add additional certificates, place .pem files in
         #{openssldir}/certs
 
