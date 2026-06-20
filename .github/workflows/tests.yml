@@ -38,6 +38,17 @@ jobs:
             # For subsequent commits, only test changed formulas
             CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Formula/.*\.rb$' || true)
           fi
+
+          # Exclude cargo-dist-generated binary formulas. These ship prebuilt
+          # release binaries (no source build) and are auto-pushed + validated by
+          # cargo-dist at release time, so the source-build audit/install below
+          # does not apply. cargo-dist emits a `BINARY_ALIASES` constant in every
+          # formula it generates, which we use as the marker. `grep -L` lists the
+          # files that do NOT contain it.
+          if [ -n "$CHANGED_FILES" ]; then
+            CHANGED_FILES=$(grep -L "BINARY_ALIASES" $CHANGED_FILES || true)
+          fi
+
           echo "changed_formulas=$CHANGED_FILES" >> $GITHUB_OUTPUT
 
       - name: Audit formulas
