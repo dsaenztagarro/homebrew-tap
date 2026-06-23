@@ -1,7 +1,11 @@
 # Formula for OpenSSL Ruby
-# Version: 3.5.4
-# Extracted date: 2025-11-14
-# Extraction command: brew extract --version=3.5.4 openssl@3 dsaenztagarro/tap
+# Version: 3.5.7
+# Tracks the OpenSSL 3.5 LTS series (supported through 2030-04-08).
+# Originally scaffolded 2025-11-14 via:
+#   brew extract --version=3.5.4 openssl@3 dsaenztagarro/tap
+# Patch bump 2026-06-23: 3.5.4 -> 3.5.7, picking up the security fixes shipped in
+#   3.5.5 (HIGH), 3.5.6 and 3.5.7 within the LTS line. Pinning a minor series means
+#   tracking its patches, not freezing one; bump in-place when a new 3.5.x ships.
 # Purpose:
 #   Provide a stable, controlled OpenSSL version for Ruby installations.
 #   Prevents automatic upgrades that can break Ruby SSL/TLS functionality.
@@ -17,9 +21,9 @@
 class OpensslRuby < Formula
   desc 'Cryptography and SSL/TLS Toolkit'
   homepage 'https://openssl-library.org'
-  url 'https://github.com/openssl/openssl/releases/download/openssl-3.5.4/openssl-3.5.4.tar.gz'
-  mirror 'http://fresh-center.net/linux/misc/openssl-3.5.4.tar.gz'
-  sha256 '967311f84955316969bdb1d8d4b983718ef42338639c621ec4c34fddef355e99'
+  url 'https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz'
+  mirror 'http://fresh-center.net/linux/misc/openssl-3.5.7.tar.gz'
+  sha256 'a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8'
   license 'Apache-2.0'
 
   livecheck do
