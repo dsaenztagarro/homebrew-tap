@@ -33,7 +33,11 @@ class OpensslRuby < Formula
 
   depends_on 'ca-certificates'
 
-  keg_only :versioned_formula
+  # Keg-only via an explicit string reason so it is honored unconditionally:
+  # this OpenSSL must never be symlinked into HOMEBREW_PREFIX, where it would
+  # shadow the system openssl@3 (bin/openssl, include/openssl/*). It exists only
+  # to be targeted by RUBY_CONFIGURE_OPTS when building Ruby.
+  keg_only 'isolated OpenSSL for building Ruby; must not shadow openssl@3'
 
   on_linux do
     resource 'Test::Harness' do
