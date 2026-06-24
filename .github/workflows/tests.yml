@@ -17,6 +17,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so the PR base commit is reachable for `git diff` below.
+          fetch-depth: 0
 
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -30,13 +33,17 @@ jobs:
       - name: Determine changed formulas
         id: changed-formulas
         run: |
-          # Get list of changed formula files
-          if [ -z "${{ github.event.before }}" ] || ! git rev-parse "${{ github.event.before }}" >/dev/null 2>&1; then
-            # For initial commits or when before ref is unavailable, test all formulas
+          # Resolve the base commit to diff against. On pull_request events
+          # github.event.before is empty, so fall back to the PR base branch tip;
+          # on push events use the commit before the push.
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+
+          if [ -z "$BASE" ] || ! git rev-parse "$BASE" >/dev/null 2>&1; then
+            # Base ref unavailable (e.g. the very first commit) — test all formulas
             CHANGED_FILES=$(find Formula -name "*.rb" -type f)
           else
-            # For subsequent commits, only test changed formulas
-            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Formula/.*\.rb$' || true)
+            # Otherwise only test the formulas this change touches
+            CHANGED_FILES=$(git diff --name-only "$BASE" HEAD | grep '^Formula/.*\.rb$' || true)
           fi
 
           # Exclude cargo-dist-generated binary formulas. These ship prebuilt
@@ -49,7 +56,14 @@ jobs:
             CHANGED_FILES=$(grep -L "BINARY_ALIASES" $CHANGED_FILES || true)
           fi
 
-          echo "changed_formulas=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          # Emit as a multi-line output via a heredoc delimiter so a list spanning
+          # several formula paths is stored intact. A plain `changed_formulas=...`
+          # line stops at the first newline and Actions rejects the remainder.
+          {
+            echo "changed_formulas<<EOF"
+            echo "$CHANGED_FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Audit formulas
         run: |
