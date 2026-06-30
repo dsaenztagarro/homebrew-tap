@@ -12,7 +12,11 @@ jobs:
   test-formulas:
     strategy:
       matrix:
-        os: [macos-13, macos-14]  # Intel and Apple Silicon
+        # macos-13 (Intel) free runners are retired: jobs queued the 24h max and
+        # were auto-cancelled, blocking every formula PR. macos-14 (Apple Silicon)
+        # matches the target platform; add an Intel `*-large` runner back here if
+        # that coverage is needed again.
+        os: [macos-14]
     runs-on: ${{ matrix.os }}
 
     steps:
