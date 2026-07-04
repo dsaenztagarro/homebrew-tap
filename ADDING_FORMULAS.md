@@ -9,6 +9,7 @@ This guide explains how to add new formulas to this personal Homebrew tap.
 - [Prerequisites](#prerequisites)
 - [Method 1: Using `brew extract` (Recommended)](#method-1-using-brew-extract-recommended)
 - [Method 2: Manual Formula Creation](#method-2-manual-formula-creation)
+- [Metadata Header](#metadata-header)
 - [Formula Validation](#formula-validation)
 - [Testing the Formula](#testing-the-formula)
 - [Committing the Formula](#committing-the-formula)
@@ -353,7 +354,8 @@ Then, in the file:
    ```ruby
    keg_only 'isolated OpenSSL for building Ruby; must not shadow openssl@3'
    ```
-3. **Add a metadata header** above the `class`, recording where it came from and why:
+3. **Add a [metadata header](#metadata-header)** above the `class`, recording where it came
+   from and why:
    ```ruby
    # Formula for OpenSSL Ruby
    # Version: 3.5.4
@@ -393,7 +395,7 @@ touch <formula-name>.rb
 
 ### Step 2: Write the Formula
 
-Use the standard Homebrew formula template:
+Fill in the [metadata header](#metadata-header) and the standard Homebrew formula template:
 
 ```ruby
 # Formula for <package-name>
@@ -440,6 +442,50 @@ curl -L -O <download-url>
 # Calculate SHA256
 shasum -a 256 <filename>
 ```
+
+---
+
+## Metadata Header
+
+Every hand-maintained formula in this tap carries a comment header above its `class` that
+records what it is, the pinned version, where it came from, and why. `brew audit` ignores it
+— it's institutional memory for the next maintainer. (cargo-dist binary formulas like
+`engineer` are generated and have no such header.)
+
+**Template:**
+```ruby
+# Formula for <Human-Readable Name>
+# Version: <version this file pins>
+# Extracted date: <YYYY-MM-DD>            # when it entered the tap
+# Source: homebrew/core commit <hash>     # where it came from
+# Reason: <why this formula — and this version — exists>
+# Tested on: <OS (codename) - arch>
+```
+
+- **`Version`** — the exact upstream version the `url`/`sha256` point at.
+- **`Extracted date` + `Source`** — provenance. For a `brew extract`ed formula, record the
+  date and the homebrew/core commit (or the full `brew extract …` command, as `openssl-ruby`
+  does). For a **hand-written** formula (Method 2), use `# Created date:` instead and point
+  `# Source:` at the upstream release URL.
+- **`Reason`** — why the tap pins this at all, and why this version. The field a future
+  maintainer actually reads.
+- **`Tested on`** — the OS/arch you verified the build on.
+
+Add optional lines when they earn their place — a series/LTS note, a keg-only rationale, or
+an in-place bump log; `Formula/openssl-ruby.rb` uses all three.
+
+**Example — a hand-written/data formula (`ca-certificates`):**
+```ruby
+# Formula for ca-certificates
+# Version: 2025-11-04
+# Extracted date: 2025-11-14
+# Source: homebrew/core ca-certificates formula
+# Reason: Standardized CA certificate store
+# Tested on: macOS (arm64)
+```
+
+[Method 1 · Step 4](#step-4-name-the-formula-and-add-a-metadata-header) shows the filled
+header for an extracted formula (`openssl-ruby`).
 
 ---
 
@@ -645,8 +691,8 @@ Before adding a formula, ask:
 ## Examples
 
 These extract *general-purpose* tools, so they take the homebrew-core `@MAJOR.MINOR` name
-(not a purpose name) and are **not** keg-only. Add a metadata header to each, then ship it
-via the PR flow in [Committing the Formula](#committing-the-formula).
+(not a purpose name) and are **not** keg-only. Add a [metadata header](#metadata-header) to
+each, then ship it via the PR flow in [Committing the Formula](#committing-the-formula).
 
 ### Example 1: Pinning Redis 7.2
 
@@ -774,7 +820,7 @@ brew audit --strict --online <formula-name>
 ## Best Practices
 
 1. **Always use `brew extract` with `--git-revision`** for maximum reproducibility
-2. **Add comprehensive metadata headers** to document extraction details
+2. **Add comprehensive [metadata headers](#metadata-header)** to document extraction details
 3. **Test formulas thoroughly** before committing
 4. **Use semantic commit messages** that explain why the formula was added
 5. **Document the reason** for choosing a specific version
