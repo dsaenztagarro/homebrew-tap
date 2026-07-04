@@ -86,6 +86,10 @@ When you **first create** a Homebrew tap, you typically:
 
 3. **Push to GitHub**: Your tap is now public and ready to use
 
+> This initial commit to `master` is a one-time bootstrap. **After it, changes ship through
+> pull requests**, not direct pushes to `master` — see
+> [Committing the Formula](#committing-the-formula).
+
 #### Phase 2: Ongoing Maintenance (After First Push)
 
 After your tap is on GitHub, **you have two options** for ongoing work:
@@ -100,26 +104,25 @@ When you run `brew tap dsaenztagarro/tap`, Homebrew clones your repository to:
 ```
 
 **This IS a full-featured git repository!** You can:
-- Make changes directly here
-- Commit changes
-- Push to GitHub
+- Create branches and commit here
+- Push branches and open pull requests
 - Pull updates
 
 ```bash
 # Navigate to tap location
 cd $(brew --repository dsaenztagarro/tap)
 
-# Check git status
+# Check git status and the (already-wired) remote
 git status
-
-# See remote
 git remote -v
-# Shows: https://github.com/dsaenztagarro/homebrew-tap
+# Shows: git@github.com:dsaenztagarro/homebrew-tap.git
 
-# Make changes, commit, push
+# Changes ship via a PR, not a push to master (see "Committing the Formula"):
+git checkout -b add-new-formula
 git add Formula/new-formula.rb
-git commit -m "Add new formula"
-git push
+git commit -m "Add new-formula"
+git push -u origin add-new-formula
+# then: gh pr create --base master --fill && gh pr merge --squash --delete-branch
 ```
 
 **Why this is recommended:**
@@ -136,12 +139,13 @@ Keep working in your original development folder (e.g., `~/Code/homebrew-tap`):
 # Work in your personal clone
 cd ~/Code/homebrew-tap
 
-# Make changes, commit, push
+# Same PR flow as Option A — branch, push, open a PR:
+git checkout -b add-new-formula
 git add Formula/new-formula.rb
-git commit -m "Add new formula"
-git push
+git commit -m "Add new-formula"
+git push -u origin add-new-formula
 
-# Sync the tap location
+# Sync the tap location after the PR merges
 brew update
 ```
 
