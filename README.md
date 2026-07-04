@@ -120,7 +120,8 @@ This practice follows the same professional standards used by industry leaders.
 | Formula | Description | Current Version |
 |---------|-------------|-----------------|
 | `ca-certificates` | Mozilla CA certificate store | 2025-11-04 |
-| `openssl-ruby` | Stable OpenSSL for Ruby installations | 3.5.4 |
+| `openssl-ruby` | Stable OpenSSL for Ruby installations | 3.5.7 |
+| `engineer` | Terminal client for the Engineer study-tracking app | 0.2.0 |
 
 **Note**: `openssl-ruby` is specifically designed for Ruby development. It requires explicit configuration and doesn't auto-upgrade, providing a stable SSL/TLS foundation for Ruby applications. See [docs/OPENSSL_RUBY_INCIDENT.md](docs/OPENSSL_RUBY_INCIDENT.md) for the full story.
 
