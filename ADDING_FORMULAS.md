@@ -18,36 +18,36 @@ This guide explains how to add new formulas to this personal Homebrew tap.
 
 ## Versioning Strategy
 
-**Important:** Before adding formulas, understand Homebrew's versioning conventions.
+**Important:** Before adding a formula, decide how it should be named and versioned.
+Read **[docs/VERSIONING_STRATEGY.md](docs/VERSIONING_STRATEGY.md)** first — the short
+version is below.
 
-This tap follows the official Homebrew naming conventions for versioned formulas:
+This tap names formulas for their **purpose/identity**, not with a homebrew-core-style
+`@X.Y` filename + `Aliases/` scheme. A formula's version lives in its `.rb` file
+(`url` + `sha256`); `brew` installs from HEAD of the default branch, so there are **no git
+tags, no `CHANGELOG`, and no `Aliases/` directory**.
 
-- **Formula files** use `@X.Y` format (e.g., `openssl@3.5.rb`)
-- **Class names** match the file (e.g., `class OpensslAT35 < Formula`)
-- **Aliases** provide convenience shortcuts (e.g., `openssl@3` → `openssl@3.5.rb`)
+- **Purpose-named formulas** (the default here). Name for the job — e.g. `openssl-ruby`
+  is an isolated OpenSSL for building Ruby, deliberately **not** named `openssl@3.5`, so it
+  never matches ruby-build's `^openssl@` auto-detection. Patch updates are edited in place
+  (no rename). If `brew extract` produces a patch-versioned file like `openssl@3.5.4.rb`,
+  rename it to the purpose name and set the class accordingly.
+- **cargo-dist binary formulas** (e.g. `engineer`). Generated and pushed by cargo-dist at
+  release; don't hand-edit. They carry a `BINARY_ALIASES` constant, which CI uses to skip
+  the source-build audit/install.
+- **General-purpose versioned formulas** (none yet). If you ever pin something like
+  `postgresql@17`, the homebrew-core `@MAJOR.MINOR` filename + major-version alias
+  convention is a fine choice — it's only wrong for the Ruby-isolation case above.
 
-**Why this matters:**
-- `brew extract` creates files like `openssl@3.5.4.rb` (includes patch version)
-- You should rename these to follow conventions: `openssl@3.5.rb`
-- This keeps your tap consistent with homebrew-core practices
-
-For detailed information about versioning, naming conventions, and update strategies, see:
-**[docs/VERSIONING_STRATEGY.md](docs/VERSIONING_STRATEGY.md)**
-
-**Quick example:**
+**Quick example — a purpose-named formula from `brew extract`:**
 ```bash
-# After extracting with brew extract
-git mv Formula/openssl@3.5.4.rb Formula/openssl@3.5.rb
+# brew extract writes a patch-versioned file; rename it to the purpose name
+git mv Formula/openssl@3.5.4.rb Formula/openssl-ruby.rb
 
-# Edit Formula/openssl@3.5.rb:
+# Edit Formula/openssl-ruby.rb:
 # Change: class OpensslAT354 < Formula
-# To:     class OpensslAT35 < Formula
-
-# Create convenience aliases
-mkdir -p Aliases
-cd Aliases
-ln -s ../Formula/openssl@3.5.rb openssl@3
-ln -s ../Formula/openssl@3.5.rb openssl@3.5.4  # backward compatibility
+# To:     class OpensslRuby < Formula
+# Update url/sha256, and use a string keg_only reason if it must stay unlinked.
 ```
 
 ---
