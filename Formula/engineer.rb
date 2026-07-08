@@ -1,25 +1,25 @@
 class Engineer < Formula
   desc "Terminal client for the Engineer study-tracking app"
   homepage "https://engineer.dsaenz.dev/developers/cli"
-  version "0.5.0"
+  version "0.6.0"
   if OS.mac?
     if Hardware::CPU.arm?
-      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.5.0/engineer-cli-aarch64-apple-darwin.tar.xz"
-      sha256 "219675d6ddd30f1ec01dc1725257ea7dff576f9abe45262a9b1becf0b88016ca"
+      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.6.0/engineer-cli-aarch64-apple-darwin.tar.xz"
+      sha256 "a87317c09647bca502c4c6500dc9e9abda54f5cb81a49cc3f77aad5770bc9164"
     end
     if Hardware::CPU.intel?
-      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.5.0/engineer-cli-x86_64-apple-darwin.tar.xz"
-      sha256 "1c2ab541115109deb279c902ace042a858ef8a1755164dc3eb3f3628f3c09fca"
+      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.6.0/engineer-cli-x86_64-apple-darwin.tar.xz"
+      sha256 "0fe76d6cd726b38b23c5c1477de4535c04b813866c80606eeead4505d6fdb1b2"
     end
   end
   if OS.linux?
     if Hardware::CPU.arm?
-      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.5.0/engineer-cli-aarch64-unknown-linux-gnu.tar.xz"
-      sha256 "cb3d1cf7044cf75778ad83a522e854f159b21eefd67aa3c9a7fac9534066f70b"
+      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.6.0/engineer-cli-aarch64-unknown-linux-gnu.tar.xz"
+      sha256 "c9daa1be5c975cd7b49c887735cb6560c4c475cff4187ae458d9446244857197"
     end
     if Hardware::CPU.intel?
-      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.5.0/engineer-cli-x86_64-unknown-linux-gnu.tar.xz"
-      sha256 "38a019efa66b2107a85ced30094c9816c731a357b9b0d00abffebaaa80bf3520"
+      url "https://github.com/dsaenztagarro/engineer-cli/releases/download/v0.6.0/engineer-cli-x86_64-unknown-linux-gnu.tar.xz"
+      sha256 "e835294e90ed188f9bbf7929ce44d493488a4dd77c4de3bd8d33985fac20f6ad"
     end
   end
   license "MIT"
